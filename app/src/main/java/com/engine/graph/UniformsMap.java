@@ -40,8 +40,8 @@ public class UniformsMap {
     public void createUniform(String uniformName) {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
-            throw new RuntimeException("Could not find uniform [" + uniformName + "] in shader program [" +
-                    programId + "]");
+            throw new RuntimeException(
+                    "Could not find uniform [" + uniformName + "] in shader program [" + programId + "]");
         }
         uniforms.put(uniformName, uniformLocation);
     }

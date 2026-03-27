@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Render {
 
     private SceneRender sceneRender;
+    private SkyBoxRender skyBoxRender;
     private GuiRender guiRender;
 
     public Render(Window window) {
@@ -18,6 +19,7 @@ public class Render {
         glCullFace(GL_BACK);
         sceneRender = new SceneRender();
         guiRender = new GuiRender(window);
+        skyBoxRender = new SkyBoxRender();
     }
 
     public void cleanup() {
@@ -31,6 +33,7 @@ public class Render {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, window.getWidth(), window.getHeight());
 
+        skyBoxRender.render(scene);
         sceneRender.render(scene);
         guiRender.render(scene);
     }

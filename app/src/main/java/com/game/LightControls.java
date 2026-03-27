@@ -14,7 +14,7 @@ import com.engine.scene.lights.*;
 
 /**
  *
- * @author thebe
+ * @author ivan.nihtyanov
  */
 public class LightControls implements IGuiInstance {
     private float[] ambientColor;

@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 /**
  *
- * @author thebe
+ * @author ivan.nihtyanov
  */
 public class AmbientLight {
     private Vector3f color;
