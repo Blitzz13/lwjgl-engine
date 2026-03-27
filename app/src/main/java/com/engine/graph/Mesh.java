@@ -32,7 +32,7 @@ public class Mesh {
     private int vaoId;
     private List<Integer> vboIdList;
 
-    public Mesh(float[] positions, float[] textCoords, int[] indices) {
+    public Mesh(float[] positions, float[] normals, float[] textCoords, int[] indices) {
         this.numVertices = indices.length;
         vboIdList = new ArrayList<>();
 
@@ -49,6 +49,16 @@ public class Mesh {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
+        // Normals VBO
+        vboId = glGenBuffers();
+        vboIdList.add(vboId);
+        FloatBuffer normalsBuffer = MemoryUtil.memCallocFloat(normals.length);
+        normalsBuffer.put(0, normals);
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
         // Texture coordinates VBO
         vboId = glGenBuffers();
         vboIdList.add(vboId);
@@ -56,18 +66,8 @@ public class Mesh {
         textCoordsBuffer.put(0, textCoords);
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-
-        // Colors
-        // vboId = glGenBuffers();
-        // vboIdList.add(vboId);
-        // FloatBuffer colorsBuffer = MemoryUtil.memCallocFloat(colors.length);
-        // colorsBuffer.put(0, colors);
-        // glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        // glBufferData(GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW);
-        // glEnableVertexAttribArray(1);
-        // glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
 
         vboId = glGenBuffers();
         vboIdList.add(vboId);
@@ -80,7 +80,7 @@ public class Mesh {
         glBindVertexArray(0);
 
         MemoryUtil.memFree(positionsBuffer);
-        // MemoryUtil.memFree(colorsBuffer);
+        MemoryUtil.memFree(normalsBuffer);
         MemoryUtil.memFree(textCoordsBuffer);
         MemoryUtil.memFree(indicesBuffer);
     }

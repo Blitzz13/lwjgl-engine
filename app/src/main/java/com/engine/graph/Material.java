@@ -20,14 +20,43 @@ public class Material {
     private Vector4f diffuseColor;
     private List<Mesh> meshList;
     private String texturePath;
+    private Vector4f ambientColor;
+    private float reflectance;
+    private Vector4f specularColor;
 
     public Material() {
         diffuseColor = DEFAULT_COLOR;
+        ambientColor = DEFAULT_COLOR;
+        specularColor = DEFAULT_COLOR;
         meshList = new ArrayList<>();
     }
 
     public void cleanup() {
         meshList.forEach(Mesh::cleanup);
+    }
+
+    public float getReflectance() {
+        return reflectance;
+    }
+
+    public Vector4f getSpecularColor() {
+        return specularColor;
+    }
+
+    public void setSpecularColor(Vector4f specularColor) {
+        this.specularColor = specularColor;
+    }
+
+    public void setReflectance(float reflectance) {
+        this.reflectance = reflectance;
+    }
+
+    public Vector4f getAmbientColor() {
+        return ambientColor;
+    }
+
+    public void setAmbientColor(Vector4f ambientColor) {
+        this.ambientColor = ambientColor;
     }
 
     public List<Mesh> getMeshList() {

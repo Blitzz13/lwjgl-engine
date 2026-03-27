@@ -10,6 +10,7 @@ import java.util.*;
 import com.engine.IGuiInstance;
 import com.engine.graph.Model;
 import com.engine.graph.TextureCache;
+import com.engine.scene.lights.SceneLights;
 
 /**
  *
@@ -22,6 +23,7 @@ public class Scene {
     private TextureCache textureCache;
     private Camera camera;
     private IGuiInstance guiInstance;
+    private SceneLights sceneLights;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
@@ -52,6 +54,14 @@ public class Scene {
 
     public void setGuiInstance(IGuiInstance guiInstance) {
         this.guiInstance = guiInstance;
+    }
+
+    public SceneLights getSceneLights() {
+        return sceneLights;
+    }
+
+    public void setSceneLights(SceneLights sceneLights) {
+        this.sceneLights = sceneLights;
     }
 
     public void resize(int width, int height) {

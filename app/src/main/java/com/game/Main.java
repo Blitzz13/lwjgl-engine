@@ -10,6 +10,9 @@ import org.joml.*;
 import com.engine.*;
 import com.engine.graph.*;
 import com.engine.scene.*;
+import com.engine.scene.lights.PointLight;
+import com.engine.scene.lights.SceneLights;
+import com.engine.scene.lights.SpotLight;
 
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -28,6 +31,7 @@ public class Main implements IAppLogic, IGuiInstance {
     private static final float MOVEMENT_SPEED = 0.005f;
     private Entity cubeEntity;
     private float rotation;
+    private LightControls lightControls;
 
     public static void main(String[] args) {
         // 1. Create the options
@@ -39,7 +43,7 @@ public class Main implements IAppLogic, IGuiInstance {
         opts.fps = 0; // Set to 0 to disable FPS limit
 
         Main main = new Main();
-        Engine gameEng = new Engine("chapter-09", opts, main);
+        Engine gameEng = new Engine("Renderer", opts, main);
         gameEng.start();
     }
 
@@ -57,7 +61,19 @@ public class Main implements IAppLogic, IGuiInstance {
         cubeEntity = new Entity("soldier-entity", soldierModel.getId());
         cubeEntity.setPosition(-0.5f, -5, -5);
         scene.addEntity(cubeEntity);
-        scene.setGuiInstance(this);
+
+        SceneLights sceneLights = new SceneLights();
+        sceneLights.getAmbientLight().setIntensity(0.3f);
+        scene.setSceneLights(sceneLights);
+        sceneLights.getPointLights().add(new PointLight(new Vector3f(1, 1, 1),
+                new Vector3f(0, 0, -1.4f), 1.0f));
+
+        Vector3f coneDir = new Vector3f(0, 0, -1);
+        sceneLights.getSpotLights().add(new SpotLight(new PointLight(new Vector3f(1, 1, 1),
+                new Vector3f(0, 0, -1.4f), 0.0f), coneDir, 140.0f));
+
+        lightControls = new LightControls(scene);
+        scene.setGuiInstance(lightControls);
     }
 
     @Override
@@ -73,30 +89,20 @@ public class Main implements IAppLogic, IGuiInstance {
             float move = diffTimeMillis * MOVEMENT_SPEED;
             if (window.isKeyPressed(GLFW_KEY_W)) {
                 camera.moveForward(move);
-                System.out.println("key W pressed");
-                System.out.println("move: " + move);
             } else if (window.isKeyPressed(GLFW_KEY_S)) {
                 camera.moveBackwards(move);
-                System.out.println("key S pressed");
-                System.out.println("move: " + move);
             }
+
             if (window.isKeyPressed(GLFW_KEY_A)) {
                 camera.moveLeft(move);
-                System.out.println("key A pressed");
-                System.out.println("move: " + move);
             } else if (window.isKeyPressed(GLFW_KEY_D)) {
                 camera.moveRight(move);
-                System.out.println("key D pressed");
-                System.out.println("move: " + move);
             }
-            if (window.isKeyPressed(GLFW_KEY_UP)) {
+
+            if (window.isKeyPressed(GLFW_KEY_E)) {
                 camera.moveUp(move);
-                System.out.println("key UP pressed");
-                System.out.println("move: " + move);
-            } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+            } else if (window.isKeyPressed(GLFW_KEY_Q)) {
                 camera.moveDown(move);
-                System.out.println("key DOWN pressed");
-                System.out.println("move: " + move);
             }
         }
 
@@ -106,8 +112,9 @@ public class Main implements IAppLogic, IGuiInstance {
                 Vector2f displVec = mouseInput.getDisplVec();
                 camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
                         (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
-                System.out.println(
-                        "Camera rotation: " + -displVec.x * MOUSE_SENSITIVITY + ", " + -displVec.y * MOUSE_SENSITIVITY);
+                // System.out.println(
+                // "Camera rotation: " + -displVec.x * MOUSE_SENSITIVITY + ", " + -displVec.y *
+                // MOUSE_SENSITIVITY);
             }
         }
     }
@@ -119,7 +126,7 @@ public class Main implements IAppLogic, IGuiInstance {
             rotation = 0;
         }
 
-        cubeEntity.setRotation(0, 1, 0, (float) Math.toRadians(rotation));
+        // cubeEntity.setRotation(0, 1, 0, (float) Math.toRadians(rotation));
         cubeEntity.updateModelMatrix();
     }
 
