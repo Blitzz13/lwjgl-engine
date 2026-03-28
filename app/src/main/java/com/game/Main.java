@@ -99,6 +99,7 @@ public class Main implements IAppLogic, IGuiInstance {
         lightControls = new LightControls(scene);
         scene.setGuiInstance(lightControls);
 
+        scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.05f));
         scene.getCamera().moveUp(0.1f);
 
         updateTerrain(scene);

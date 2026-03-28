@@ -25,12 +25,14 @@ public class Scene {
     private IGuiInstance guiInstance;
     private SceneLights sceneLights;
     private SkyBox skyBox;
+    private Fog fog;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
         textureCache = new TextureCache();
         camera = new Camera();
+        fog = new Fog();
     }
 
     public Map<String, Model> getModelMap() {
@@ -71,6 +73,14 @@ public class Scene {
 
     public void setSceneLights(SceneLights sceneLights) {
         this.sceneLights = sceneLights;
+    }
+
+    public Fog getFog() {
+        return fog;
+    }
+
+    public void setFog(Fog fog) {
+        this.fog = fog;
     }
 
     public void resize(int width, int height) {

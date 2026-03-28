@@ -6,6 +6,7 @@
 package com.engine.graph;
 
 import com.engine.scene.Entity;
+import com.engine.scene.Fog;
 import com.engine.scene.Scene;
 import com.engine.scene.lights.AmbientLight;
 import com.engine.scene.lights.DirLight;
@@ -19,13 +20,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
@@ -53,6 +47,9 @@ public class SceneRender {
     }
 
     public void render(Scene scene) {
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         shaderProgram.bind();
 
         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjMatrix());
@@ -60,6 +57,11 @@ public class SceneRender {
         uniformsMap.setUniform("txtSampler", 0);
 
         updateLights(scene);
+
+        Fog fog = scene.getFog();
+        uniformsMap.setUniform("fog.activeFog", fog.isActive() ? 1 : 0);
+        uniformsMap.setUniform("fog.color", fog.getColor());
+        uniformsMap.setUniform("fog.density", fog.getDensity());
 
         Collection<Model> models = scene.getModelMap().values();
         TextureCache textureCache = scene.getTextureCache();
@@ -90,6 +92,7 @@ public class SceneRender {
         glBindVertexArray(0);
 
         shaderProgram.unbind();
+        glDisable(GL_BLEND);
     }
 
     private void updateLights(Scene scene) {
@@ -194,6 +197,10 @@ public class SceneRender {
         uniformsMap.createUniform("material.reflectance");
         uniformsMap.createUniform("ambientLight.factor");
         uniformsMap.createUniform("ambientLight.color");
+
+        uniformsMap.createUniform("fog.activeFog");
+        uniformsMap.createUniform("fog.color");
+        uniformsMap.createUniform("fog.density");
 
         for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
             String name = "pointLights[" + i + "]";
