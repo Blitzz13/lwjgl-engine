@@ -20,6 +20,22 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL14.GL_FUNC_ADD;
+import static org.lwjgl.opengl.GL14.glBlendEquation;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
@@ -55,6 +71,7 @@ public class SceneRender {
         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjMatrix());
         uniformsMap.setUniform("viewMatrix", scene.getCamera().getViewMatrix());
         uniformsMap.setUniform("txtSampler", 0);
+        uniformsMap.setUniform("normalSampler", 1);
 
         updateLights(scene);
 
@@ -77,6 +94,16 @@ public class SceneRender {
                 Texture texture = textureCache.getTexture(material.getTexturePath());
                 glActiveTexture(GL_TEXTURE0);
                 texture.bind();
+
+                String normalMapPath = material.getNormalMapPath();
+                boolean hasNormalMapPath = normalMapPath != null;
+                uniformsMap.setUniform("material.hasNormalMap", hasNormalMapPath ? 1 : 0);
+
+                if (hasNormalMapPath) {
+                    Texture normalMapTexture = textureCache.getTexture(normalMapPath);
+                    glActiveTexture(GL_TEXTURE1);
+                    normalMapTexture.bind();
+                }
 
                 for (Mesh mesh : material.getMeshList()) {
                     uniformsMap.setUniform("material.diffuse", material.getDiffuseColor());
@@ -189,12 +216,15 @@ public class SceneRender {
         uniformsMap.createUniform("projectionMatrix");
         uniformsMap.createUniform("viewMatrix");
         uniformsMap.createUniform("txtSampler");
-        uniformsMap.createUniform("material.diffuse");
+        uniformsMap.createUniform("normalSampler");
 
+        uniformsMap.createUniform("material.diffuse");
         uniformsMap.createUniform("material.ambient");
         uniformsMap.createUniform("material.diffuse");
         uniformsMap.createUniform("material.specular");
         uniformsMap.createUniform("material.reflectance");
+        uniformsMap.createUniform("material.hasNormalMap");
+
         uniformsMap.createUniform("ambientLight.factor");
         uniformsMap.createUniform("ambientLight.color");
 
@@ -211,6 +241,7 @@ public class SceneRender {
             uniformsMap.createUniform(name + ".att.linear");
             uniformsMap.createUniform(name + ".att.exponent");
         }
+
         for (int i = 0; i < MAX_SPOT_LIGHTS; i++) {
             String name = "spotLights[" + i + "]";
             uniformsMap.createUniform(name + ".pl.position");

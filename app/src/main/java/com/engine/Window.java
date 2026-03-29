@@ -29,6 +29,12 @@ public class Window {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
+        if (opts.antiAliasing) {
+            glfwWindowHint(GLFW_SAMPLES, 4);
+        }
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
@@ -148,5 +154,6 @@ public class Window {
         public int height;
         public int ups = Engine.TARGET_UPS;
         public int width;
+        public boolean antiAliasing;
     }
 }

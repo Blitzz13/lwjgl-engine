@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL;
 import com.engine.Window;
 import com.engine.scene.Scene;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class Render {
 
@@ -17,6 +17,8 @@ public class Render {
         GL.createCapabilities();
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_DEPTH_TEST);
         sceneRender = new SceneRender();
         guiRender = new GuiRender(window);
         skyBoxRender = new SkyBoxRender();
