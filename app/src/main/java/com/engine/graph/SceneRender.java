@@ -5,6 +5,7 @@
 
 package com.engine.graph;
 
+import com.engine.scene.AnimationData;
 import com.engine.scene.Entity;
 import com.engine.scene.Fog;
 import com.engine.scene.Scene;
@@ -106,10 +107,17 @@ public class SceneRender {
                 }
 
                 for (Mesh mesh : material.getMeshList()) {
-                    uniformsMap.setUniform("material.diffuse", material.getDiffuseColor());
                     glBindVertexArray(mesh.getVaoId());
                     for (Entity entity : entities) {
                         uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
+                        AnimationData animationData = entity.getAnimationData();
+
+                        if (animationData == null) {
+                            uniformsMap.setUniform("bonesMatrices", AnimationData.DEFAULT_BONES_MATRICES);
+                        } else {
+                            uniformsMap.setUniform("bonesMatrices", animationData.getCurrentFrame().boneMatrices());
+                        }
+
                         glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
                     }
                 }
@@ -217,6 +225,7 @@ public class SceneRender {
         uniformsMap.createUniform("viewMatrix");
         uniformsMap.createUniform("txtSampler");
         uniformsMap.createUniform("normalSampler");
+        uniformsMap.createUniform("bonesMatrices");
 
         uniformsMap.createUniform("material.diffuse");
         uniformsMap.createUniform("material.ambient");

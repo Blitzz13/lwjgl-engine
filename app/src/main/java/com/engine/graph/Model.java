@@ -7,7 +7,10 @@ package com.engine.graph;
 
 import java.util.*;
 
+import org.joml.Matrix4f;
+
 import com.engine.scene.Entity;
+
 /**
  *
  * @author ivan.nihtyanov
@@ -18,11 +21,13 @@ public class Model {
     // TODO: store them somwhere else, not in the model
     private List<Entity> entitiesList;
     private List<Material> materialList;
+    private List<Animation> animationList;
 
-    public Model(String id, List<Material> materialList) {
+    public Model(String id, List<Material> materialList, List<Animation> animationList) {
         this.id = id;
         entitiesList = new ArrayList<>();
         this.materialList = materialList;
+        this.animationList = animationList;
     }
 
     public void cleanup() {
@@ -39,5 +44,15 @@ public class Model {
 
     public List<Material> getMaterialList() {
         return materialList;
+    }
+
+    public List<Animation> getAnimationList() {
+        return animationList;
+    }
+
+    public record AnimatedFrame(Matrix4f[] boneMatrices) {
+    }
+
+    public record Animation(String name, double duration, List<AnimatedFrame> frames) {
     }
 }

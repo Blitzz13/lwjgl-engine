@@ -34,6 +34,7 @@ public class Main implements IAppLogic, IGuiInstance {
     private LightControls lightControls;
     private static final int NUM_CHUNKS = 4;
     private Entity[][] terrainEntities;
+    private AnimationData animationData;
 
     public static void main(String[] args) {
         // 1. Create the options
@@ -80,6 +81,18 @@ public class Main implements IAppLogic, IGuiInstance {
         soldierEntity = new Entity("soldier-entity", soldierModel.getId());
         soldierEntity.setPosition(-0.5f, -5, -5);
         scene.addEntity(soldierEntity);
+
+        String bobModelId = "bobModel";
+        Model bobModel = ModelLoader.loadModel(bobModelId, "src/main/resources/models/bob/boblamp.md5mesh",
+                scene.getTextureCache(), true);
+        scene.addModel(bobModel);
+        Entity bobEntity = new Entity("bobEntity", bobModelId);
+        System.out.println("bobModel animation list: " + bobModel.getAnimationList());
+        bobEntity.setScale(0.05f);
+        bobEntity.updateModelMatrix();
+        animationData = new AnimationData(bobModel.getAnimationList().get(0));
+        bobEntity.setAnimationData(animationData);
+        scene.addEntity(bobEntity);
 
         SceneLights sceneLights = new SceneLights();
         sceneLights.getAmbientLight().setIntensity(0.3f);
@@ -170,6 +183,8 @@ public class Main implements IAppLogic, IGuiInstance {
         // cubeEntity.setRotation(0, 1, 0, (float) Math.toRadians(rotation));
         soldierEntity.updateModelMatrix();
         updateTerrain(scene);
+
+        animationData.nextFrame();
     }
 
     public void updateTerrain(Scene scene) {

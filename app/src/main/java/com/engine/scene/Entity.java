@@ -19,6 +19,7 @@ public class Entity {
     private Vector3f position;
     private Quaternionf rotation;
     private float scale;
+    private AnimationData animationData;
 
     public Entity(String id, String modelId) {
         this.id = id;
@@ -27,6 +28,14 @@ public class Entity {
         position = new Vector3f();
         rotation = new Quaternionf();
         scale = 1;
+    }
+
+    public AnimationData getAnimationData() {
+        return animationData;
+    }
+
+    public void setAnimationData(AnimationData animationData) {
+        this.animationData = animationData;
     }
 
     public String getId() {
