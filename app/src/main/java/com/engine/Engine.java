@@ -60,7 +60,6 @@ public class Engine {
         float deltaUpdate = 0;
         float deltaFps = 0;
 
-        long updateTime = initialTime;
         IGuiInstance iGuiInstance = scene.getGuiInstance();
         while (running && !window.windowShouldClose()) {
             window.pollEvents();
@@ -83,8 +82,7 @@ public class Engine {
             // appLogic.input(window, scene, elapsedTime);
 
             if (deltaUpdate >= 1) {
-                appLogic.update(window, scene, now - updateTime);
-                updateTime = now;
+                appLogic.update(window, scene, elapsedTime);
                 deltaUpdate--;
             }
 

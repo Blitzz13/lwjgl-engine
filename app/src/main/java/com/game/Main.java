@@ -6,6 +6,7 @@
 package com.game;
 
 import org.joml.*;
+import org.lwjgl.openal.AL11;
 
 import com.engine.*;
 import com.engine.graph.*;
@@ -13,6 +14,10 @@ import com.engine.scene.*;
 import com.engine.scene.lights.PointLight;
 import com.engine.scene.lights.SceneLights;
 import com.engine.scene.lights.SpotLight;
+import com.engine.sound.SoundBuffer;
+import com.engine.sound.SoundListener;
+import com.engine.sound.SoundManager;
+import com.engine.sound.SoundSource;
 
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -35,12 +40,13 @@ public class Main implements IAppLogic, IGuiInstance {
     private static final int NUM_CHUNKS = 4;
     private Entity[][] terrainEntities;
     private AnimationData animationData;
+    private SoundSource playerSoundSource;
+    private SoundManager soundMgr;
+    private Entity bobEntity = new Entity("bobEntity", "bobModel");
 
     public static void main(String[] args) {
-        // 1. Create the options
         Window.WindowOptions opts = new Window.WindowOptions();
 
-        // 2. SET YOUR CUSTOM SIZE HERE
         opts.width = 1280;
         opts.height = 720;
         opts.fps = 0; // Set to 0 to disable FPS limit
@@ -79,16 +85,15 @@ public class Main implements IAppLogic, IGuiInstance {
         scene.addModel(soldierModel);
 
         soldierEntity = new Entity("soldier-entity", soldierModel.getId());
-        soldierEntity.setPosition(-0.5f, -5, -5);
+        soldierEntity.setPosition(-3f, -5, -5);
         scene.addEntity(soldierEntity);
 
         String bobModelId = "bobModel";
         Model bobModel = ModelLoader.loadModel(bobModelId, "src/main/resources/models/bob/boblamp.md5mesh",
                 scene.getTextureCache(), true);
         scene.addModel(bobModel);
-        Entity bobEntity = new Entity("bobEntity", bobModelId);
-        System.out.println("bobModel animation list: " + bobModel.getAnimationList());
-        bobEntity.setScale(0.05f);
+        bobEntity.setScale(0.08f);
+        bobEntity.setPosition(-0.5f, -3, -5);
         bobEntity.updateModelMatrix();
         animationData = new AnimationData(bobModel.getAnimationList().get(0));
         bobEntity.setAnimationData(animationData);
@@ -116,6 +121,7 @@ public class Main implements IAppLogic, IGuiInstance {
         scene.getCamera().moveUp(0.1f);
 
         updateTerrain(scene);
+        initSounds(bobEntity.getPosition(), scene.getCamera());
     }
 
     @Override
@@ -171,6 +177,8 @@ public class Main implements IAppLogic, IGuiInstance {
                 // MOUSE_SENSITIVITY);
             }
         }
+
+        soundMgr.updateListenerPosition(camera);
     }
 
     @Override
@@ -242,5 +250,30 @@ public class Main implements IAppLogic, IGuiInstance {
         imGuiIO.addMouseButtonEvent(1, mouseInput.isRightButtonPressed());
 
         return imGuiIO.getWantCaptureMouse() || imGuiIO.getWantCaptureKeyboard();
+    }
+
+    private void initSounds(Vector3f position, Camera camera) {
+        soundMgr = new SoundManager();
+        soundMgr.setAttenuationModel(AL11.AL_EXPONENT_DISTANCE);
+        soundMgr.setListener(new SoundListener(camera.getPosition()));
+
+        SoundBuffer buffer = new SoundBuffer("src/main/resources/sounds/creak1.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        playerSoundSource = new SoundSource(false, false);
+        playerSoundSource.setPosition(position);
+        playerSoundSource.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("CREAK", playerSoundSource);
+
+        // MODIFIED: Fine-tune the range
+        playerSoundSource.setReferenceDistance(1.0f); // Full volume when 1 unit away
+        playerSoundSource.setRolloffFactor(2.0f); // Drop off faster (good for small rooms)
+        playerSoundSource.setMaxDistance(10.0f); // Completely silent at 50 units
+
+        buffer = new SoundBuffer("src/main/resources/sounds/woo_scary.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        SoundSource source = new SoundSource(true, true);
+        source.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("MUSIC", source);
+        source.play();
     }
 }
